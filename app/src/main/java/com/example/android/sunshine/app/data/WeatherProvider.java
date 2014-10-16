@@ -30,10 +30,12 @@ public class WeatherProvider extends ContentProvider {
     private static final int LOCATION_ID = 301;
 
     private static final UriMatcher uriMatcher = buildUriMatcher();
+    private WeatherDbHelper dbHelper;
 
     @Override
     public boolean onCreate() {
-        return false;
+        dbHelper = new WeatherDbHelper(getContext());
+        return true;
     }
 
     @Override
@@ -43,7 +45,21 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        final int match = uriMatcher.match(uri);
+        switch (match) {
+            case WEATHER_WITH_LOCATION_AND_DATE:
+                return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
+            case WEATHER_WITH_LOCATION:
+                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+            case WEATHER:
+                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+            case LOCATION:
+                return WeatherContract.LocationEntry.CONTENT_TYPE;
+            case LOCATION_ID:
+                return WeatherContract.LocationEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unkown urk: " + uri);
+        }
     }
 
     @Override
